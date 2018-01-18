@@ -17,10 +17,10 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/text_wifi_setting_info">
 
-        <beini.com.wifimanage.view.MyRecycleView
+        <beini.com.wifimanage.view.CustomerRecycleView
             android:id="@+id/recycle_wifi"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

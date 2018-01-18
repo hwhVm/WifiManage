@@ -11,17 +11,19 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import beini.com.wifimanage.util.BLog;
-import beini.com.wifimanage.adapter.BaseAdapter;
 import beini.com.wifimanage.adapter.BaseBean;
-import beini.com.wifimanage.util.GetWifiInfoUtil;
 import beini.com.wifimanage.adapter.WiFiInfoAdapter;
+import beini.com.wifimanage.util.BLog;
+import beini.com.wifimanage.util.GetWifiInfoUtil;
 import beini.com.wifimanage.util.WifiTool;
+import beini.com.wifimanage.view.CustomerRecycleView;
 
 public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefreshListener {
-    private RecyclerView recyclerView;
+    private CustomerRecycleView recyclerView;
     private TextView text_wifi_setting_info;
     private SwipeRefreshLayout swip_refresh;
     private WifiTool wifiTool;
@@ -39,11 +41,24 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
         text_wifi_setting_info = findViewById(R.id.text_wifi_setting_info);
         swip_refresh = findViewById(R.id.swip_refresh);
         swip_refresh.setOnRefreshListener(this);
-
         text_wifi_setting_info.setText(GetWifiInfoUtil.getWifiInfo(this));
         wifiTool = new WifiTool(this);
-
-
+        scanResults = new ArrayList<>();
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        scanResults.add(null);
+        initList(scanResults);
     }
 
     public void getAllNetWorkList() {
@@ -53,30 +68,51 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
         if (scanResults != null && scanResults.size() > 0) {
             if (isFirstLoad) {
                 wifiTool.getConfiguration();
-
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                wifiInfoAdapter = new WiFiInfoAdapter(new BaseBean<>(R.layout.item_wifi_list, scanResults));
-                recyclerView.setAdapter(wifiInfoAdapter);
-                recyclerView.setItemAnimator(new DefaultItemAnimator());
-                wifiInfoAdapter.setItemClick(onItemClickListener);
+                wifiInfoAdapter.update(scanResults);
                 isFirstLoad = false;
-
             } else {
                 wifiTool.getConfiguration();
                 wifiInfoAdapter.notifyDataSetChanged();
             }
-            swip_refresh.setRefreshing(false);
         }
+        swip_refresh.setRefreshing(false);
     }
 
-    WiFiInfoAdapter.OnItemClickListener onItemClickListener = new BaseAdapter.OnItemClickListener() {
-        @Override
-        public void onItemClick(View view, int position) {
-            ScanResult scanResult = scanResults.get(position);
-            String strResult = connectWifi("divoomzhongke508", scanResult);
-            BLog.d("strResult=" + strResult + "   SSID==" + scanResult.SSID);
-        }
-    };
+    private void initList(final List<ScanResult> scanResults) {
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        wifiInfoAdapter = new WiFiInfoAdapter(new BaseBean<>(R.layout.item_recycle, scanResults));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setListenter(new CustomerRecycleView.ItemHleperListenter() {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                Collections.swap(scanResults, viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                wifiInfoAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+            }
+        });
+        recyclerView.setItemClick(new CustomerRecycleView.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                BLog.e("--onItemClick------>position=" + position);
+//               ScanResult scanResult = scanResults.get(position);
+//            String strResult = connectWifi("divoomzhongke508", scanResult);
+//            BLog.d("strResult=" + strResult + "   SSID==" + scanResult.SSID);
+            }
+        });
+        recyclerView.setOnItemLongClickListener(new CustomerRecycleView.onItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View view, int position) {
+                BLog.e("---onItemLongClick----->position=" + position);
+            }
+        });
+        recyclerView.setAdapter(wifiInfoAdapter);
+    }
+
 
     // /data/misc/wifi/wpa_supplicant.conf
     public String connectWifi(String wifiPassword, ScanResult scanResult) {
@@ -112,6 +148,8 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
     @Override
     public void onRefresh() {
         BLog.d("onRefresh()");
-        getAllNetWorkList();
+//        getAllNetWorkList();
+        swip_refresh.setRefreshing(false);
+
     }
 }

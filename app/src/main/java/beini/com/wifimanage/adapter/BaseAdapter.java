@@ -4,7 +4,6 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,7 +17,7 @@ import java.util.List;
  * Created by beini on 2017/2/18.
  */
 
-public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.ViewHolder> implements View.OnClickListener, View.OnLongClickListener, View.OnTouchListener {
+public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.ViewHolder> {
 
     private List<T> baseList;
     private int layoutId;
@@ -33,9 +32,6 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.Vi
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
         ViewHolder holder = new ViewHolder(view);
-        view.setOnClickListener(this);
-        view.setOnLongClickListener(this);
-        view.setOnTouchListener(this);
         return holder;
     }
 
@@ -47,16 +43,8 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.Vi
         return baseList.size();
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
 
-
-
-        return false;
-    }
-
-
-    protected class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         View view;
 
         ViewHolder(View view) {
@@ -89,38 +77,5 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.Vi
         notifyItemRangeChanged(postion, baseList.size());
     }
 
-    //item  click 事件
-    private OnItemClickListener itemClickListener = null;
 
-    public void setItemClick(OnItemClickListener itemClickListener) {
-        this.itemClickListener = itemClickListener;
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (itemClickListener != null)
-            itemClickListener.onItemClick(view, (int) view.getTag());
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(View view, int position);
-    }
-
-    // item onlongClick 事件
-    private onItemLongClickListener itemLongClickListener = null;
-
-    public void setOnItemLongClickListener(onItemLongClickListener onItemLongClickListener) {
-        this.itemLongClickListener = onItemLongClickListener;
-    }
-
-    @Override
-    public boolean onLongClick(View v) {
-        if (itemLongClickListener != null)
-            itemLongClickListener.onItemLongClick(v, (int) v.getTag());
-        return true;
-    }
-
-    private interface onItemLongClickListener {
-        void onItemLongClick(View view, int position);
-    }
 }
